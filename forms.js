@@ -1,7 +1,10 @@
 // Shared form-submission handler for all Studio site forms.
-// Set your Supabase project's function URL below once deployed, e.g.
-// https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-form-email
-const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-form-email';
+const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://rfjksupbwhgtkobljgya.supabase.co/functions/v1/quick-worker';
+// Supabase Edge Functions require an anon/public API key header by default.
+// This is your project's PUBLIC anon key — safe to expose in client-side code,
+// unlike the Gmail app password. Set it once you have it from
+// Supabase Dashboard → Project Settings → API → "anon public" key.
+const SUPABASE_ANON_KEY = window.STUDIO_SUPABASE_ANON_KEY || 'YOUR-ANON-PUBLIC-KEY';
 
 async function submitStudioForm(form, formType, { redirectTo, successMessage } = {}) {
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -18,7 +21,11 @@ async function submitStudioForm(form, formType, { redirectTo, successMessage } =
 
     const res = await fetch(`${BACKEND_URL}?form=${encodeURIComponent(formType)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY
+      },
       body: JSON.stringify(data)
     });
 
