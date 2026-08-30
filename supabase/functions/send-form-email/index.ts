@@ -1,10 +1,14 @@
 // Supabase Edge Function: send-form-email
-// Deploy with: supabase functions deploy send-form-email
-// Set secrets with: supabase secrets set GMAIL_USER=... GMAIL_APP_PASSWORD=... NOTIFY_EMAIL=... ALLOWED_ORIGIN=...
+// Deploy with: supabase functions deploy quick-worker
+// Set secrets with: supabase secrets set RESEND_API_KEY=... NOTIFY_EMAIL=... ALLOWED_ORIGIN=...
 // Secrets are stored by Supabase, never in this file or your git repo.
+//
+// Uses Resend's HTTPS API instead of raw SMTP, because many edge/serverless
+// runtimes (including Supabase Edge Functions) only allow outbound HTTPS,
+// not raw SMTP socket connections — which is why direct Gmail SMTP send
+// can silently fail to deliver even when the function itself doesn't error.
 
 import { serve } from "https://deno.land/std@0.203.0/http/server.ts";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") || "*";
 
@@ -40,7 +44,6 @@ serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    // form type passed as ?form=contact | wordpress | data-entry | video-editing | ai-creation
     const formType = url.searchParams.get("form") || "contact";
     const subjectLabel = FORM_SUBJECTS[formType] || "New Website Submission";
 
@@ -57,40 +60,44 @@ serve(async (req: Request) => {
       });
     }
 
-    const gmailUser = Deno.env.get("GMAIL_USER");
-    const gmailPass = Deno.env.get("GMAIL_APP_PASSWORD");
-    const notifyEmail = Deno.env.get("NOTIFY_EMAIL") || gmailUser;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const notifyEmail = Deno.env.get("NOTIFY_EMAIL");
 
-    if (!gmailUser || !gmailPass) {
-      console.error("Missing GMAIL_USER or GMAIL_APP_PASSWORD secret");
+    if (!resendApiKey || !notifyEmail) {
+      console.error("Missing RESEND_API_KEY or NOTIFY_EMAIL secret");
       return new Response(JSON.stringify({ error: "Server not configured." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const client = new SMTPClient({
-      connection: {
-        hostname: "smtp.gmail.com",
-        port: 465,
-        tls: true,
-        auth: { username: gmailUser, password: gmailPass },
+    const bodyHtml = Object.entries(fields)
+      .map(([k, v]) => `<p><strong>${k}:</strong> ${v}</p>`)
+      .join("");
+
+    const resendRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        from: "Studio Website <onboarding@resend.dev>",
+        to: [notifyEmail],
+        reply_to: fields.email,
+        subject: `${subjectLabel} — ${fields.name}`,
+        html: bodyHtml,
+      }),
     });
 
-    const bodyText = Object.entries(fields)
-      .map(([k, v]) => `${k}: ${v}`)
-      .join("\n");
-
-    await client.send({
-      from: gmailUser,
-      to: notifyEmail,
-      replyTo: fields.email,
-      subject: `${subjectLabel} — ${fields.name}`,
-      content: bodyText,
-    });
-
-    await client.close();
+    if (!resendRes.ok) {
+      const errText = await resendRes.text();
+      console.error("Resend API error:", resendRes.status, errText);
+      return new Response(JSON.stringify({ error: "Failed to send. Please try again later." }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -104,3 +111,4 @@ serve(async (req: Request) => {
     });
   }
 });
+
