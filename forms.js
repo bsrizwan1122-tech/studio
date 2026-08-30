@@ -1,10 +1,15 @@
 // Shared form-submission handler for all Studio site forms.
-const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://rfjksupbwhgtkobljgya.supabase.co/functions/v1/send-form-email';
-// Supabase Edge Functions require an anon/public API key header by default.
-// This is your project's PUBLIC anon key — safe to expose in client-side code,
-// unlike the Gmail app password. Set it once you have it from
-// Supabase Dashboard → Project Settings → API → "anon public" key.
-const SUPABASE_ANON_KEY = window.STUDIO_SUPABASE_ANON_KEY || 'sb_publishable_FdZR4YMiI9LkYkZCaPIdgQ_7qh2ONiv';
+// Uses Web3Forms — a hosted form-to-email service. This access key is
+// designed to be public/client-side (unlike API secrets or app passwords).
+const WEB3FORMS_ACCESS_KEY = '27626821-713c-4a60-aa43-660d2f34492c';
+
+const FORM_SUBJECTS = {
+  contact: 'New Contact Message',
+  wordpress: 'New Order: WordPress Development',
+  'data-entry': 'New Order: Data Entry',
+  'video-editing': 'New Order: Video Editing',
+  'ai-creation': 'New Order: AI Creation',
+};
 
 async function submitStudioForm(form, formType, { redirectTo, successMessage } = {}) {
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -13,26 +18,29 @@ async function submitStudioForm(form, formType, { redirectTo, successMessage } =
   const data = {};
   new FormData(form).forEach((value, key) => { data[key] = value; });
 
+  data.access_key = WEB3FORMS_ACCESS_KEY;
+  data.subject = FORM_SUBJECTS[formType] || 'New Website Submission';
+  data.from_name = 'Studio Website';
+
   try {
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
     }
 
-    const res = await fetch(`${BACKEND_URL}?form=${encodeURIComponent(formType)}`, {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'apikey': SUPABASE_ANON_KEY
+        Accept: 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     const result = await res.json();
 
-    if (!res.ok) {
-      throw new Error(result.error || 'Submission failed.');
+    if (!result.success) {
+      throw new Error(result.message || 'Submission failed.');
     }
 
     alert(successMessage || 'Thanks! We will get back to you shortly.');
