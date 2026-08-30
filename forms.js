@@ -4,7 +4,7 @@ const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://rfjksupbwhgtkobljgya.s
 // This is your project's PUBLIC anon key — safe to expose in client-side code,
 // unlike the Gmail app password. Set it once you have it from
 // Supabase Dashboard → Project Settings → API → "anon public" key.
-const SUPABASE_ANON_KEY = window.STUDIO_SUPABASE_ANON_KEY || 'YOUR-ANON-PUBLIC-KEY';
+const SUPABASE_ANON_KEY = window.STUDIO_SUPABASE_ANON_KEY || 'sb_publishable_FdZR4YMiI9LkYkZCaPIdgQ_7qh2ONiv';
 
 async function submitStudioForm(form, formType, { redirectTo, successMessage } = {}) {
   const submitBtn = form.querySelector('button[type="submit"]');
