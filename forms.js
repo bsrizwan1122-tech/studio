@@ -1,9 +1,9 @@
 // Shared form-submission handler for all Studio site forms.
-// Update BACKEND_URL to your deployed backend's URL once it's live
-// (e.g. https://studio-forms-backend.onrender.com).
-const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://YOUR-BACKEND-URL.example.com';
+// Set your Supabase project's function URL below once deployed, e.g.
+// https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-form-email
+const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/send-form-email';
 
-async function submitStudioForm(form, endpoint, { redirectTo, successMessage } = {}) {
+async function submitStudioForm(form, formType, { redirectTo, successMessage } = {}) {
   const submitBtn = form.querySelector('button[type="submit"]');
   const originalText = submitBtn ? submitBtn.textContent : null;
 
@@ -16,7 +16,7 @@ async function submitStudioForm(form, endpoint, { redirectTo, successMessage } =
       submitBtn.textContent = 'Sending...';
     }
 
-    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+    const res = await fetch(`${BACKEND_URL}?form=${encodeURIComponent(formType)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
