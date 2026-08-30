@@ -1,5 +1,5 @@
 // Shared form-submission handler for all Studio site forms.
-const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://rfjksupbwhgtkobljgya.supabase.co/functions/v1/quick-worker';
+const BACKEND_URL = window.STUDIO_BACKEND_URL || 'https://rfjksupbwhgtkobljgya.supabase.co/functions/v1/send-form-email';
 // Supabase Edge Functions require an anon/public API key header by default.
 // This is your project's PUBLIC anon key — safe to expose in client-side code,
 // unlike the Gmail app password. Set it once you have it from
