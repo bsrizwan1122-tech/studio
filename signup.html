@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Services Studio | Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-navy text-gray-100 font-sans antialiased min-h-screen flex flex-col">
+    <div class="flex-grow flex items-center justify-center w-full p-6">
+    <div class="w-full max-w-md">
+        <div class="mb-6 text-center">
+            <a href="index.html" class="text-2xl font-bold text-white tracking-wide">Studio<span class="text-gold">.</span></a>
+        </div>
+        <div class="bg-blue p-8 md:p-10 rounded-2xl shadow-2xl border border-gray-800">
+            <h1 class="text-3xl font-bold mb-2 text-center">Create Account</h1>
+            <p class="text-gray-400 text-center mb-8">Sign up to track your orders and requests.</p>
+
+            <button id="google-btn" type="button" class="w-full bg-white text-gray-800 font-semibold rounded-lg py-3 mb-3 flex items-center justify-center gap-3 hover:opacity-90 transition">
+                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.5 29.5 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 6.5 29.5 4.5 24 4.5c-7.7 0-14.3 4.4-17.7 10.8z"/><path fill="#4CAF50" d="M24 44.5c5.4 0 10.3-1.8 14-4.9l-6.5-5.4c-2 1.5-4.6 2.4-7.5 2.4-5.4 0-9.9-3.4-11.4-8.2l-6.6 5C9.6 40 16.3 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.4 4.2-4.4 5.6l6.5 5.4c-.4.4 6.6-4.8 6.6-14.9 0-1.2-.1-2.4-.4-3.5z"/></svg>
+                Continue with Google
+            </button>
+
+            <button id="facebook-btn" type="button" class="w-full bg-[#1877F2] text-white font-semibold rounded-lg py-3 mb-6 flex items-center justify-center gap-3 hover:opacity-90 transition">
+                <i class="fab fa-facebook-f"></i>
+                Continue with Facebook
+            </button>
+
+            <div class="flex items-center gap-4 mb-6">
+                <div class="flex-1 h-px bg-gray-700"></div>
+                <span class="text-gray-500 text-xs uppercase">or sign up with email</span>
+                <div class="flex-1 h-px bg-gray-700"></div>
+            </div>
+
+            <form id="signup-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-2 text-gray-300">Full Name</label>
+                    <input type="text" id="name" required class="w-full bg-navy border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-2 text-gray-300">Email Address</label>
+                    <input type="email" id="email" required class="w-full bg-navy border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-bold mb-2 text-gray-300">Password</label>
+                    <input type="password" id="password" required minlength="6" class="w-full bg-navy border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition">
+                    <p class="text-gray-500 text-xs mt-1">At least 6 characters</p>
+                </div>
+                <button type="submit" id="submit-btn" class="btn-primary w-full py-3.5">Create Account</button>
+            </form>
+
+            <p id="message" class="hidden mt-4 text-center text-sm"></p>
+
+            <p class="text-gray-400 text-center text-sm mt-6">
+                Already have an account? <a href="login.html" class="text-gold hover:underline">Log in</a>
+            </p>
+        </div>
+    </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const form = document.getElementById('signup-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const messageEl = document.getElementById('message');
+
+        function showMessage(text, isError) {
+            messageEl.textContent = text;
+            messageEl.className = 'mt-4 text-center text-sm ' + (isError ? 'text-red-400' : 'text-green-400');
+            messageEl.classList.remove('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
+
+            try {
+                await signUpWithEmail(name, email, password);
+                showMessage('Account created! Check your email to confirm, then log in.', false);
+                form.reset();
+            } catch (err) {
+                showMessage(err.message || 'Something went wrong. Please try again.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        });
+
+        document.getElementById('google-btn').addEventListener('click', () => {
+            signInWithProvider('google').catch(err => showMessage(err.message, true));
+        });
+        document.getElementById('facebook-btn').addEventListener('click', () => {
+            signInWithProvider('facebook').catch(err => showMessage(err.message, true));
+        });
+    </script>
+</body>
+</html>

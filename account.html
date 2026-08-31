@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Services Studio | My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-navy text-gray-100 font-sans antialiased">
+    <header class="sticky top-0 z-50 bg-navy border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between">
+            <div class="text-2xl font-bold"><a href="index.html">Studio<span class="text-gold">.</span></a></div>
+            <nav class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-gold transition">Home</a>
+                <a href="portfolio.html" class="hover:text-gold transition">Portfolio</a>
+                <a href="contact.html" class="btn-primary ml-4">Get a Quote</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="py-20 px-6 container mx-auto">
+        <div id="loading" class="max-w-md mx-auto text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-3xl text-gold"></i>
+        </div>
+
+        <div id="account-content" class="hidden max-w-md mx-auto">
+            <div class="bg-blue p-8 rounded-2xl border border-gray-800 text-center">
+                <div class="w-20 h-20 rounded-full bg-gold/10 border border-gold flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user text-3xl text-gold"></i>
+                </div>
+                <h1 id="user-name" class="text-2xl font-bold mb-1"></h1>
+                <p id="user-email" class="text-gray-400 mb-8"></p>
+                <button id="logout-btn" class="btn-secondary w-full py-3">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Log Out
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script src="auth.js"></script>
+    <script>
+        (async () => {
+            const user = await getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
+            document.getElementById('user-name').textContent = name;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('account-content').classList.remove('hidden');
+        })();
+
+        document.getElementById('logout-btn').addEventListener('click', signOutUser);
+    </script>
+</body>
+</html>
