@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Services Studio | AI Image Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-navy text-gray-100 font-sans antialiased">
+    <header class="sticky top-0 z-50 bg-navy border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between">
+            <div class="text-2xl font-bold"><a href="index.html">Studio<span class="text-gold">.</span></a></div>
+            <nav class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-gold transition">Home</a>
+                <a href="about.html" class="hover:text-gold transition">About</a>
+                <a href="portfolio.html" class="hover:text-gold transition">Portfolio</a>
+                <a href="pricing.html" class="hover:text-gold transition">Pricing</a>
+                <div class="relative nav-dropdown py-2">
+                    <button class="hover:text-gold transition flex items-center">
+                        Tools <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="absolute left-0 mt-2 w-56 bg-blue rounded-md shadow-lg py-2 nav-dropdown-menu">
+                        <a href="tools-image-compressor.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Image Compressor</a>
+                        <a href="tools-image-generator.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Image Generator</a>
+                        <a href="tools-translator.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Translator</a>
+                    </div>
+                </div>
+                <a href="contact.html" class="btn-primary ml-4">Get a Quote</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="py-20 px-6 container mx-auto">
+        <div class="max-w-3xl mx-auto text-center mb-12">
+            <div class="section-label justify-center">Free Tool</div>
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4">AI Image Generator</h1>
+            <p class="text-gray-400">Describe anything and generate an AI image instantly — free, no account, no limits.</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-blue p-6 md:p-8 rounded-xl border border-gray-800">
+                <label class="block text-sm font-bold mb-2 text-gray-300">Describe your image</label>
+                <textarea id="prompt-input" rows="3" placeholder="e.g. a golden retriever surfing on a wave at sunset, cinematic lighting" class="w-full bg-navy border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition mb-6"></textarea>
+
+                <div class="grid sm:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold mb-2 text-gray-300">Style</label>
+                        <select id="model-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
+                            <option value="flux">Flux (default)</option>
+                            <option value="flux-realism">Realistic</option>
+                            <option value="flux-anime">Anime</option>
+                            <option value="flux-3d">3D</option>
+                            <option value="turbo">Turbo (fast)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2 text-gray-300">Aspect Ratio</label>
+                        <select id="size-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
+                            <option value="1024x1024">Square (1:1)</option>
+                            <option value="1024x768">Landscape (4:3)</option>
+                            <option value="768x1024">Portrait (3:4)</option>
+                            <option value="1280x720">Widescreen (16:9)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2 text-gray-300">Variation</label>
+                        <button id="reroll-btn" type="button" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-gray-300 hover:border-gold hover:text-gold transition">
+                            <i class="fas fa-dice mr-1"></i> New Seed
+                        </button>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="btn-primary w-full py-3.5 text-lg">
+                    <i class="fas fa-wand-magic-sparkles mr-2"></i>Generate Image
+                </button>
+            </div>
+
+            <!-- Result -->
+            <div id="result-wrap" class="hidden mt-8 bg-blue p-6 md:p-8 rounded-xl border border-gray-800 text-center">
+                <div id="loading-state" class="hidden py-16">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-gold mb-4"></i>
+                    <p class="text-gray-400">Generating your image, this can take up to 20 seconds...</p>
+                </div>
+                <div id="image-state" class="hidden">
+                    <img id="result-image" class="rounded-lg max-w-full mx-auto border border-gray-700 mb-6">
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <a id="download-link" download="ai-generated-image.jpg" class="btn-primary w-full py-3 block text-center">
+                            <i class="fas fa-download mr-2"></i>Download
+                        </a>
+                        <button id="regenerate-btn" class="btn-secondary w-full py-3">
+                            <i class="fas fa-redo mr-2"></i>Generate Again
+                        </button>
+                    </div>
+                </div>
+                <div id="error-state" class="hidden py-8 text-red-400">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                    <p>Something went wrong generating the image. Please try again.</p>
+                </div>
+            </div>
+
+            <p class="text-gray-500 text-xs text-center mt-6">
+                Powered by the free, open-source <a href="https://pollinations.ai" target="_blank" rel="noopener" class="text-gold hover:underline">Pollinations.ai</a> API.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy pt-16 pb-8 border-t border-gray-800 px-6 mt-16">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <a href="index.html" class="text-2xl font-bold text-white tracking-wide block mb-4">Studio<span class="text-gold">.</span></a>
+                <p class="text-gray-400 text-sm mb-6">Premium digital services agency specializing in WordPress, Data Entry, Video Editing, and AI Creation.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
+                <ul class="space-y-3">
+                    <li><a href="index.html" class="text-gray-400 hover:text-gold transition text-sm">Home</a></li>
+                    <li><a href="about.html" class="text-gray-400 hover:text-gold transition text-sm">About Us</a></li>
+                    <li><a href="portfolio.html" class="text-gray-400 hover:text-gold transition text-sm">Portfolio</a></li>
+                    <li><a href="pricing.html" class="text-gray-400 hover:text-gold transition text-sm">Pricing</a></li>
+                    <li><a href="contact.html" class="text-gray-400 hover:text-gold transition text-sm">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Free Tools</h4>
+                <ul class="space-y-3">
+                    <li><a href="tools-image-compressor.html" class="text-gray-400 hover:text-gold transition text-sm">Image Compressor</a></li>
+                    <li><a href="tools-image-generator.html" class="text-gray-400 hover:text-gold transition text-sm">Image Generator</a></li>
+                    <li><a href="tools-translator.html" class="text-gray-400 hover:text-gold transition text-sm">Translator</a></li>
+                    <li><a href="tools-image-generator.html" class="text-gray-400 hover:text-gold transition text-sm">Image Generator</a></li>
+                    <li><a href="tools-translator.html" class="text-gray-400 hover:text-gold transition text-sm">Translator</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Contact Us</h4>
+                <ul class="space-y-4">
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-envelope text-gold mt-1 mr-3"></i><a href="mailto:hello@studio.com" class="hover:text-gold transition">hello@studio.com</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fab fa-whatsapp text-gold mt-1 mr-3"></i><a href="tel:+1234567890" class="hover:text-gold transition">+1 (234) 567-890</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-map-marker-alt text-gold mt-1 mr-3"></i><span>123 Digital Ave, Tech District<br>New York, NY 10001</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mx-auto border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+            <p>&copy; 2026 Digital Services Studio. All rights reserved.</p>
+            <div class="mt-4 md:mt-0 space-x-4">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const promptInput = document.getElementById('prompt-input');
+        const modelSelect = document.getElementById('model-select');
+        const sizeSelect = document.getElementById('size-select');
+        const generateBtn = document.getElementById('generate-btn');
+        const regenerateBtn = document.getElementById('regenerate-btn');
+        const rerollBtn = document.getElementById('reroll-btn');
+        const resultWrap = document.getElementById('result-wrap');
+        const loadingState = document.getElementById('loading-state');
+        const imageState = document.getElementById('image-state');
+        const errorState = document.getElementById('error-state');
+        const resultImage = document.getElementById('result-image');
+        const downloadLink = document.getElementById('download-link');
+
+        let seed = Math.floor(Math.random() * 1000000);
+
+        rerollBtn.addEventListener('click', () => {
+            seed = Math.floor(Math.random() * 1000000);
+        });
+
+        function buildImageUrl() {
+            const prompt = promptInput.value.trim();
+            const [width, height] = sizeSelect.value.split('x');
+            const model = modelSelect.value;
+            const encoded = encodeURIComponent(prompt);
+            return `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&model=${model}&nologo=true&seed=${seed}`;
+        }
+
+        function generate() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                promptInput.focus();
+                promptInput.classList.add('border-red-500');
+                setTimeout(() => promptInput.classList.remove('border-red-500'), 1500);
+                return;
+            }
+
+            resultWrap.classList.remove('hidden');
+            loadingState.classList.remove('hidden');
+            imageState.classList.add('hidden');
+            errorState.classList.add('hidden');
+            resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const url = buildImageUrl();
+            const img = new Image();
+            img.onload = () => {
+                resultImage.src = url;
+                downloadLink.href = url;
+                loadingState.classList.add('hidden');
+                imageState.classList.remove('hidden');
+            };
+            img.onerror = () => {
+                loadingState.classList.add('hidden');
+                errorState.classList.remove('hidden');
+            };
+            img.src = url;
+        }
+
+        generateBtn.addEventListener('click', generate);
+        regenerateBtn.addEventListener('click', () => {
+            seed = Math.floor(Math.random() * 1000000);
+            generate();
+        });
+    </script>
+</body>
+</html>
