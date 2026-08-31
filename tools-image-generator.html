@@ -36,32 +36,66 @@
         <div class="max-w-3xl mx-auto text-center mb-12">
             <div class="section-label justify-center">Free Tool</div>
             <h1 class="text-4xl lg:text-5xl font-bold mb-4">AI Image Generator</h1>
-            <p class="text-gray-400">Describe anything and generate an AI image instantly — free, no account, no limits.</p>
+            <p class="text-gray-400">Describe anything — or upload a reference image — and generate high-quality AI art instantly.</p>
         </div>
 
         <div class="max-w-3xl mx-auto">
             <div class="bg-blue p-6 md:p-8 rounded-xl border border-gray-800">
+
                 <label class="block text-sm font-bold mb-2 text-gray-300">Describe your image</label>
                 <textarea id="prompt-input" rows="3" placeholder="e.g. a golden retriever surfing on a wave at sunset, cinematic lighting" class="w-full bg-navy border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gold transition mb-6"></textarea>
+
+                <!-- Reference image upload -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold mb-2 text-gray-300">Reference Image <span class="text-gray-500 font-normal">(optional — image-to-image)</span></label>
+                    <div id="ref-drop-zone" class="border-2 border-dashed border-gray-700 rounded-lg p-4 flex items-center gap-4 cursor-pointer hover:border-gold transition">
+                        <div id="ref-placeholder" class="flex items-center gap-3 text-gray-400 text-sm">
+                            <i class="fas fa-image text-xl"></i>
+                            <span>Click or drag an image here to transform it</span>
+                        </div>
+                        <img id="ref-preview" class="hidden h-16 w-16 object-cover rounded-md border border-gray-700">
+                        <span id="ref-filename" class="hidden text-sm text-gray-300 truncate flex-1"></span>
+                        <button id="ref-clear-btn" type="button" class="hidden text-gray-500 hover:text-red-400 transition"><i class="fas fa-times-circle"></i></button>
+                    </div>
+                    <input type="file" id="ref-file-input" accept="image/png, image/jpeg, image/webp" class="hidden">
+                    <p class="text-xs text-gray-500 mt-2">When a reference image is used, it's uploaded anonymously to a public host (catbox.moe) so the AI model can read it — don't upload private or sensitive images.</p>
+                </div>
 
                 <div class="grid sm:grid-cols-3 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-bold mb-2 text-gray-300">Style</label>
                         <select id="model-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
-                            <option value="flux">Flux (default)</option>
-                            <option value="flux-realism">Realistic</option>
-                            <option value="flux-anime">Anime</option>
-                            <option value="flux-3d">3D</option>
-                            <option value="turbo">Turbo (fast)</option>
+                            <option value="zimage">Zimage (Best Quality)</option>
+                            <option value="flux">Flux (Classic)</option>
+                            <option value="klein">Klein</option>
                         </select>
                     </div>
                     <div>
+                        <label class="block text-sm font-bold mb-2 text-gray-300">Dimension</label>
+                        <select id="dimension-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
+                            <option value="2d">2D (Flat / Illustration)</option>
+                            <option value="3d">3D (Rendered)</option>
+                            <option value="photo">Photorealistic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2 text-gray-300">Quality</label>
+                        <select id="quality-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
+                            <option value="1024">Standard (1024px)</option>
+                            <option value="1536" selected>High (1536px)</option>
+                            <option value="2048">Ultra (2048px)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                    <div>
                         <label class="block text-sm font-bold mb-2 text-gray-300">Aspect Ratio</label>
                         <select id="size-select" class="w-full bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition">
-                            <option value="1024x1024">Square (1:1)</option>
-                            <option value="1024x768">Landscape (4:3)</option>
-                            <option value="768x1024">Portrait (3:4)</option>
-                            <option value="1280x720">Widescreen (16:9)</option>
+                            <option value="1:1">Square (1:1)</option>
+                            <option value="4:3">Landscape (4:3)</option>
+                            <option value="3:4">Portrait (3:4)</option>
+                            <option value="16:9">Widescreen (16:9)</option>
                         </select>
                     </div>
                     <div>
@@ -81,7 +115,7 @@
             <div id="result-wrap" class="hidden mt-8 bg-blue p-6 md:p-8 rounded-xl border border-gray-800 text-center">
                 <div id="loading-state" class="hidden py-16">
                     <i class="fas fa-circle-notch fa-spin text-4xl text-gold mb-4"></i>
-                    <p class="text-gray-400">Generating your image, this can take up to 20 seconds...</p>
+                    <p id="loading-text" class="text-gray-400">Generating your image, this can take up to 20 seconds...</p>
                 </div>
                 <div id="image-state" class="hidden">
                     <img id="result-image" class="rounded-lg max-w-full mx-auto border border-gray-700 mb-6">
@@ -96,7 +130,7 @@
                 </div>
                 <div id="error-state" class="hidden py-8 text-red-400">
                     <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
-                    <p>Something went wrong generating the image. Please try again.</p>
+                    <p id="error-text">Something went wrong generating the image. Please try again.</p>
                 </div>
             </div>
 
@@ -134,8 +168,6 @@
                     <li><a href="tools-image-compressor.html" class="text-gray-400 hover:text-gold transition text-sm">Image Compressor</a></li>
                     <li><a href="tools-image-generator.html" class="text-gray-400 hover:text-gold transition text-sm">Image Generator</a></li>
                     <li><a href="tools-translator.html" class="text-gray-400 hover:text-gold transition text-sm">Translator</a></li>
-                    <li><a href="tools-image-generator.html" class="text-gray-400 hover:text-gold transition text-sm">Image Generator</a></li>
-                    <li><a href="tools-translator.html" class="text-gray-400 hover:text-gold transition text-sm">Translator</a></li>
                 </ul>
             </div>
             <div>
@@ -159,32 +191,130 @@
     <script>
         const promptInput = document.getElementById('prompt-input');
         const modelSelect = document.getElementById('model-select');
+        const dimensionSelect = document.getElementById('dimension-select');
+        const qualitySelect = document.getElementById('quality-select');
         const sizeSelect = document.getElementById('size-select');
         const generateBtn = document.getElementById('generate-btn');
         const regenerateBtn = document.getElementById('regenerate-btn');
         const rerollBtn = document.getElementById('reroll-btn');
         const resultWrap = document.getElementById('result-wrap');
         const loadingState = document.getElementById('loading-state');
+        const loadingText = document.getElementById('loading-text');
         const imageState = document.getElementById('image-state');
         const errorState = document.getElementById('error-state');
+        const errorText = document.getElementById('error-text');
         const resultImage = document.getElementById('result-image');
         const downloadLink = document.getElementById('download-link');
 
+        const refDropZone = document.getElementById('ref-drop-zone');
+        const refFileInput = document.getElementById('ref-file-input');
+        const refPlaceholder = document.getElementById('ref-placeholder');
+        const refPreview = document.getElementById('ref-preview');
+        const refFilename = document.getElementById('ref-filename');
+        const refClearBtn = document.getElementById('ref-clear-btn');
+
         let seed = Math.floor(Math.random() * 1000000);
+        let refFile = null;
+        let uploadedRefUrl = null;
+
+        // Dimension keyword hints appended to the prompt
+        const DIMENSION_HINTS = {
+            '2d': '2D flat illustration, vector art style, flat colors, clean lines',
+            '3d': '3D render, octane render, volumetric lighting, physically based rendering, depth of field',
+            'photo': 'photorealistic, DSLR photo, sharp focus, natural lighting'
+        };
+
+        // Aspect ratio -> pixel dimensions based on selected quality tier
+        function getDimensions() {
+            const base = parseInt(qualitySelect.value, 10);
+            const ratio = sizeSelect.value;
+            const map = {
+                '1:1': [base, base],
+                '4:3': [base, Math.round(base * 3 / 4)],
+                '3:4': [Math.round(base * 3 / 4), base],
+                '16:9': [base, Math.round(base * 9 / 16)],
+            };
+            return map[ratio] || [base, base];
+        }
 
         rerollBtn.addEventListener('click', () => {
             seed = Math.floor(Math.random() * 1000000);
         });
 
-        function buildImageUrl() {
-            const prompt = promptInput.value.trim();
-            const [width, height] = sizeSelect.value.split('x');
-            const model = modelSelect.value;
-            const encoded = encodeURIComponent(prompt);
-            return `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&model=${model}&nologo=true&seed=${seed}`;
+        // Reference image handling
+        refDropZone.addEventListener('click', () => refFileInput.click());
+        refDropZone.addEventListener('dragover', (e) => { e.preventDefault(); refDropZone.classList.add('border-gold'); });
+        refDropZone.addEventListener('dragleave', () => refDropZone.classList.remove('border-gold'));
+        refDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            refDropZone.classList.remove('border-gold');
+            if (e.dataTransfer.files.length) setRefFile(e.dataTransfer.files[0]);
+        });
+        refFileInput.addEventListener('change', () => {
+            if (refFileInput.files.length) setRefFile(refFileInput.files[0]);
+        });
+
+        function setRefFile(file) {
+            if (!file.type.match(/^image\/(png|jpeg|webp)$/)) return;
+            refFile = file;
+            uploadedRefUrl = null;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                refPreview.src = e.target.result;
+                refPreview.classList.remove('hidden');
+                refPlaceholder.classList.add('hidden');
+                refFilename.textContent = file.name;
+                refFilename.classList.remove('hidden');
+                refClearBtn.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
         }
 
-        function generate() {
+        refClearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            refFile = null;
+            uploadedRefUrl = null;
+            refFileInput.value = '';
+            refPreview.classList.add('hidden');
+            refPlaceholder.classList.remove('hidden');
+            refFilename.classList.add('hidden');
+            refClearBtn.classList.add('hidden');
+        });
+
+        async function uploadReferenceImage() {
+            if (uploadedRefUrl) return uploadedRefUrl;
+            const formData = new FormData();
+            formData.append('reqtype', 'fileupload');
+            formData.append('fileToUpload', refFile);
+            const res = await fetch('https://catbox.moe/user/api.php', {
+                method: 'POST',
+                body: formData
+            });
+            if (!res.ok) throw new Error('Reference image upload failed');
+            const url = (await res.text()).trim();
+            if (!url.startsWith('http')) throw new Error('Reference image upload failed');
+            uploadedRefUrl = url;
+            return url;
+        }
+
+        function buildImageUrl(refUrl) {
+            const rawPrompt = promptInput.value.trim();
+            const hint = DIMENSION_HINTS[dimensionSelect.value] || '';
+            const fullPrompt = hint ? `${rawPrompt}, ${hint}` : rawPrompt;
+            const [width, height] = getDimensions();
+            const encoded = encodeURIComponent(fullPrompt);
+
+            // Reference image requires the "kontext" model for image-to-image
+            const model = refUrl ? 'kontext' : modelSelect.value;
+
+            let url = `https://image.pollinations.ai/prompt/${encoded}?width=${width}&height=${height}&model=${model}&nologo=true&seed=${seed}&enhance=true`;
+            if (refUrl) {
+                url += `&image=${encodeURIComponent(refUrl)}`;
+            }
+            return url;
+        }
+
+        async function generate() {
             const prompt = promptInput.value.trim();
             if (!prompt) {
                 promptInput.focus();
@@ -197,21 +327,37 @@
             loadingState.classList.remove('hidden');
             imageState.classList.add('hidden');
             errorState.classList.add('hidden');
+            loadingText.textContent = 'Generating your image, this can take up to 20 seconds...';
             resultWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-            const url = buildImageUrl();
-            const img = new Image();
-            img.onload = () => {
-                resultImage.src = url;
-                downloadLink.href = url;
-                loadingState.classList.add('hidden');
-                imageState.classList.remove('hidden');
-            };
-            img.onerror = () => {
+            try {
+                let refUrl = null;
+                if (refFile) {
+                    loadingText.textContent = 'Uploading reference image...';
+                    refUrl = await uploadReferenceImage();
+                    loadingText.textContent = 'Generating your image, this can take up to 20 seconds...';
+                }
+
+                const url = buildImageUrl(refUrl);
+                const img = new Image();
+                img.onload = () => {
+                    resultImage.src = url;
+                    downloadLink.href = url;
+                    loadingState.classList.add('hidden');
+                    imageState.classList.remove('hidden');
+                };
+                img.onerror = () => {
+                    errorText.textContent = 'Something went wrong generating the image. Please try again.';
+                    loadingState.classList.add('hidden');
+                    errorState.classList.remove('hidden');
+                };
+                img.src = url;
+            } catch (err) {
+                console.error(err);
+                errorText.textContent = 'Could not upload the reference image. Please try again or generate without one.';
                 loadingState.classList.add('hidden');
                 errorState.classList.remove('hidden');
-            };
-            img.src = url;
+            }
         }
 
         generateBtn.addEventListener('click', generate);
