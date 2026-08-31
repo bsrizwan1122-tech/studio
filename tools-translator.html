@@ -43,13 +43,14 @@
             <div class="bg-blue p-6 md:p-8 rounded-xl border border-gray-800">
 
                 <!-- Language selectors -->
-                <div class="flex items-center gap-3 mb-6">
+                <div class="flex items-center gap-3 mb-2">
                     <select id="from-lang" class="flex-1 bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition"></select>
                     <button id="swap-btn" type="button" class="w-11 h-11 flex-shrink-0 rounded-lg border border-gray-700 hover:border-gold hover:text-gold transition flex items-center justify-center">
                         <i class="fas fa-right-left"></i>
                     </button>
                     <select id="to-lang" class="flex-1 bg-navy border border-gray-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:border-gold transition"></select>
                 </div>
+                <p id="detected-lang" class="hidden text-xs text-gold mb-6"></p>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
@@ -161,6 +162,7 @@
         const swapBtn = document.getElementById('swap-btn');
         const charCount = document.getElementById('char-count');
         const errorMsg = document.getElementById('error-msg');
+        const detectedLangEl = document.getElementById('detected-lang');
 
         function populateSelect(select, includeAuto) {
             Object.entries(LANGUAGES).forEach(([code, name]) => {
@@ -186,11 +188,40 @@
             const tmp = fromSelect.value;
             fromSelect.value = toSelect.value;
             toSelect.value = tmp;
+            detectedLangEl.classList.add('hidden');
         });
+
+        fromSelect.addEventListener('change', () => detectedLangEl.classList.add('hidden'));
+
+        // Primary engine: Google's public translate endpoint (supports auto-detect).
+        async function translateGoogle(text, from, to) {
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Google endpoint failed');
+            const data = await res.json();
+            if (!Array.isArray(data) || !Array.isArray(data[0])) throw new Error('Unexpected response');
+            const translated = data[0].map(seg => (seg && seg[0]) ? seg[0] : '').join('');
+            const detected = data[2] || null; // detected source language code, when from='auto'
+            if (!translated.trim()) throw new Error('Empty translation');
+            return { translated, detected };
+        }
+
+        // Fallback engine: MyMemory (used only if the primary fails, e.g. rate limit or network issue).
+        async function translateMyMemory(text, from, to) {
+            const safeFrom = (from === 'auto') ? 'en' : from; // MyMemory has no auto-detect
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${safeFrom}|${to}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('MyMemory endpoint failed');
+            const data = await res.json();
+            const translated = data && data.responseData && data.responseData.translatedText;
+            if (!translated || !translated.trim()) throw new Error('Empty translation');
+            return { translated, detected: null };
+        }
 
         async function translate() {
             const text = sourceText.value.trim();
             errorMsg.classList.add('hidden');
+            detectedLangEl.classList.add('hidden');
             if (!text) {
                 translatedDiv.textContent = '';
                 return;
@@ -201,14 +232,22 @@
 
             const from = fromSelect.value;
             const to = toSelect.value;
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
 
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('Translation request failed');
-                const data = await res.json();
-                const translated = data[0].map(seg => seg[0]).join('');
-                translatedDiv.textContent = translated;
+                let result;
+                try {
+                    result = await translateGoogle(text, from, to);
+                } catch (primaryErr) {
+                    console.warn('Primary translate engine failed, trying fallback:', primaryErr);
+                    result = await translateMyMemory(text, from, to);
+                }
+
+                translatedDiv.textContent = result.translated;
+
+                if (from === 'auto' && result.detected && LANGUAGES[result.detected]) {
+                    detectedLangEl.textContent = `Detected language: ${LANGUAGES[result.detected]}`;
+                    detectedLangEl.classList.remove('hidden');
+                }
             } catch (err) {
                 errorMsg.textContent = 'Translation failed. Please try again in a moment.';
                 errorMsg.classList.remove('hidden');
