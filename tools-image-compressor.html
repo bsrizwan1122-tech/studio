@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Services Studio | Image Compressor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-navy text-gray-100 font-sans antialiased">
+    <header class="sticky top-0 z-50 bg-navy border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between">
+            <div class="text-2xl font-bold"><a href="index.html">Studio<span class="text-gold">.</span></a></div>
+            <nav class="hidden md:flex space-x-8 items-center">
+                <a href="index.html" class="hover:text-gold transition">Home</a>
+                <a href="about.html" class="hover:text-gold transition">About</a>
+                <a href="portfolio.html" class="hover:text-gold transition">Portfolio</a>
+                <a href="pricing.html" class="hover:text-gold transition">Pricing</a>
+                <a href="contact.html" class="btn-primary ml-4">Get a Quote</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="py-20 px-6 container mx-auto">
+        <div class="max-w-3xl mx-auto text-center mb-12">
+            <div class="section-label justify-center">Free Tool</div>
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4">Image Compressor</h1>
+            <p class="text-gray-400">Shrink JPG, PNG, or WebP images right in your browser — nothing is uploaded anywhere, everything happens on your device.</p>
+        </div>
+
+        <div class="max-w-3xl mx-auto">
+
+            <!-- Drop Zone -->
+            <div id="drop-zone" class="bg-blue border-2 border-dashed border-gray-700 rounded-2xl p-10 text-center cursor-pointer transition hover:border-gold">
+                <i class="fas fa-cloud-upload-alt text-4xl text-gold mb-4"></i>
+                <p class="font-bold mb-1">Drag & drop an image here</p>
+                <p class="text-gray-400 text-sm mb-4">or click to browse (JPG, PNG, WebP)</p>
+                <input type="file" id="file-input" accept="image/png, image/jpeg, image/webp" class="hidden">
+            </div>
+
+            <!-- Controls (hidden until an image is loaded) -->
+            <div id="controls" class="hidden mt-8 bg-blue p-6 md:p-8 rounded-xl border border-gray-800">
+                <div class="grid md:grid-cols-2 gap-8 mb-6">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-400 mb-2">Original</p>
+                        <img id="preview-original" class="rounded-lg max-h-64 mx-auto border border-gray-700">
+                        <p id="size-original" class="text-sm mt-2 text-gray-400"></p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-400 mb-2">Compressed</p>
+                        <img id="preview-compressed" class="rounded-lg max-h-64 mx-auto border border-gold">
+                        <p id="size-compressed" class="text-sm mt-2 text-gold font-semibold"></p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="flex justify-between text-sm font-bold mb-2">
+                        <span>Quality</span>
+                        <span id="quality-value" class="text-gold">80%</span>
+                    </label>
+                    <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full accent-gold">
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <button id="download-btn" class="btn-primary w-full py-3">
+                        <i class="fas fa-download mr-2"></i>Download Compressed
+                    </button>
+                    <button id="reset-btn" class="btn-secondary w-full py-3">
+                        <i class="fas fa-redo mr-2"></i>Compress Another
+                    </button>
+                </div>
+            </div>
+
+            <div id="error-msg" class="hidden mt-4 text-center text-red-400 text-sm"></div>
+        </div>
+
+        <!-- Feature strip -->
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-16">
+            <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <h4 class="font-bold mb-1">100% Private</h4>
+                    <p class="text-gray-400 text-sm">Your image never leaves your device — no uploads, no servers.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-bolt"></i></div>
+                <div>
+                    <h4 class="font-bold mb-1">Instant Results</h4>
+                    <p class="text-gray-400 text-sm">Compression happens live in your browser — no waiting.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-sliders-h"></i></div>
+                <div>
+                    <h4 class="font-bold mb-1">Adjustable Quality</h4>
+                    <p class="text-gray-400 text-sm">Fine-tune the quality slider to balance size and clarity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy pt-16 pb-8 border-t border-gray-800 px-6 mt-16">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <a href="index.html" class="text-2xl font-bold text-white tracking-wide block mb-4">Studio<span class="text-gold">.</span></a>
+                <p class="text-gray-400 text-sm mb-6">Premium digital services agency specializing in WordPress, Data Entry, Video Editing, and AI Creation.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
+                <ul class="space-y-3">
+                    <li><a href="index.html" class="text-gray-400 hover:text-gold transition text-sm">Home</a></li>
+                    <li><a href="about.html" class="text-gray-400 hover:text-gold transition text-sm">About Us</a></li>
+                    <li><a href="portfolio.html" class="text-gray-400 hover:text-gold transition text-sm">Portfolio</a></li>
+                    <li><a href="pricing.html" class="text-gray-400 hover:text-gold transition text-sm">Pricing</a></li>
+                    <li><a href="contact.html" class="text-gray-400 hover:text-gold transition text-sm">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Our Services</h4>
+                <ul class="space-y-3">
+                    <li><a href="services/wordpress.html" class="text-gray-400 hover:text-gold transition text-sm">WordPress Development</a></li>
+                    <li><a href="services/data-entry.html" class="text-gray-400 hover:text-gold transition text-sm">Professional Data Entry</a></li>
+                    <li><a href="services/video-editing.html" class="text-gray-400 hover:text-gold transition text-sm">Video Editing</a></li>
+                    <li><a href="services/ai-creation.html" class="text-gray-400 hover:text-gold transition text-sm">AI Creation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Contact Us</h4>
+                <ul class="space-y-4">
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-envelope text-gold mt-1 mr-3"></i><a href="mailto:hello@studio.com" class="hover:text-gold transition">hello@studio.com</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fab fa-whatsapp text-gold mt-1 mr-3"></i><a href="tel:+1234567890" class="hover:text-gold transition">+1 (234) 567-890</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-map-marker-alt text-gold mt-1 mr-3"></i><span>123 Digital Ave, Tech District<br>New York, NY 10001</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mx-auto border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+            <p>&copy; 2026 Digital Services Studio. All rights reserved.</p>
+            <div class="mt-4 md:mt-0 space-x-4">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const controls = document.getElementById('controls');
+        const previewOriginal = document.getElementById('preview-original');
+        const previewCompressed = document.getElementById('preview-compressed');
+        const sizeOriginal = document.getElementById('size-original');
+        const sizeCompressed = document.getElementById('size-compressed');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityValue = document.getElementById('quality-value');
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        let originalFile = null;
+        let originalImage = null;
+        let compressedBlob = null;
+        let compressedMime = 'image/jpeg';
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        function clearError() {
+            errorMsg.classList.add('hidden');
+            errorMsg.textContent = '';
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-gold');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-gold');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-gold');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            clearError();
+            if (!file.type.match(/^image\/(png|jpeg|webp)$/)) {
+                showError('Please choose a JPG, PNG, or WebP image.');
+                return;
+            }
+
+            originalFile = file;
+            compressedMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    previewOriginal.src = e.target.result;
+                    sizeOriginal.textContent = formatBytes(file.size);
+                    controls.classList.remove('hidden');
+                    compress();
+                    controls.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function compress() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImage, 0, 0);
+
+            const quality = parseInt(qualitySlider.value, 10) / 100;
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    showError('Compression failed. Try a different image.');
+                    return;
+                }
+                compressedBlob = blob;
+                previewCompressed.src = URL.createObjectURL(blob);
+                sizeCompressed.textContent = formatBytes(blob.size);
+            }, compressedMime, compressedMime === 'image/png' ? undefined : quality);
+        }
+
+        qualitySlider.addEventListener('input', () => {
+            qualityValue.textContent = qualitySlider.value + '%';
+            compress();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!compressedBlob) return;
+            const ext = compressedMime === 'image/png' ? 'png' : 'jpg';
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(compressedBlob);
+            const baseName = originalFile ? originalFile.name.replace(/\.[^/.]+$/, '') : 'image';
+            a.download = `${baseName}-compressed.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            originalFile = null;
+            originalImage = null;
+            compressedBlob = null;
+            fileInput.value = '';
+            controls.classList.add('hidden');
+            clearError();
+            dropZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    </script>
+</body>
+</html>
