@@ -28,10 +28,14 @@ async function signInWithEmail(email, password) {
 }
 
 async function signInWithProvider(provider) {
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider,
-    options: { redirectTo: window.location.origin + '/account.html' }
-  });
+  const options = { redirectTo: window.location.origin + '/account.html' };
+  // Force Google's account chooser to always appear, even if the browser
+  // is already signed into a Google account — lets people pick a different
+  // account or add a new one instead of auto-continuing with just one.
+  if (provider === 'google') {
+    options.queryParams = { prompt: 'select_account' };
+  }
+  const { error } = await supabaseClient.auth.signInWithOAuth({ provider, options });
   if (error) throw error;
 }
 
