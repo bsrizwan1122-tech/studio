@@ -58,6 +58,14 @@
 
     <script src="auth.js"></script>
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTarget = urlParams.get('redirect');
+        if (redirectTarget) {
+            document.querySelectorAll('a[href="signup.html"]').forEach(a => {
+                a.href = `signup.html?redirect=${encodeURIComponent(redirectTarget)}`;
+            });
+        }
+
         const form = document.getElementById('login-form');
         const submitBtn = document.getElementById('submit-btn');
         const messageEl = document.getElementById('message');
@@ -78,7 +86,7 @@
 
             try {
                 await signInWithEmail(email, password);
-                window.location.href = 'account.html';
+                window.location.href = redirectTarget || 'account.html';
             } catch (err) {
                 showMessage(err.message || 'Login failed. Please check your credentials.', true);
             } finally {
@@ -88,10 +96,10 @@
         });
 
         document.getElementById('google-btn').addEventListener('click', () => {
-            signInWithProvider('google').catch(err => showMessage(err.message, true));
+            signInWithProvider('google', redirectTarget).catch(err => showMessage(err.message, true));
         });
         document.getElementById('facebook-btn').addEventListener('click', () => {
-            signInWithProvider('facebook').catch(err => showMessage(err.message, true));
+            signInWithProvider('facebook', redirectTarget).catch(err => showMessage(err.message, true));
         });
     </script>
 </body>

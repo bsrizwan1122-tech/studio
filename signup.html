@@ -63,6 +63,16 @@
 
     <script src="auth.js"></script>
     <script>
+        // Preserve ?redirect= across the login <-> signup links so the
+        // eventual destination isn't lost if the person switches forms.
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTarget = urlParams.get('redirect');
+        if (redirectTarget) {
+            document.querySelectorAll('a[href="login.html"]').forEach(a => {
+                a.href = `login.html?redirect=${encodeURIComponent(redirectTarget)}`;
+            });
+        }
+
         const form = document.getElementById('signup-form');
         const submitBtn = document.getElementById('submit-btn');
         const messageEl = document.getElementById('message');
@@ -84,7 +94,12 @@
 
             try {
                 await signUpWithEmail(name, email, password);
-                showMessage('Account created! Check your email to confirm, then log in.', false);
+                showMessage(
+                    redirectTarget
+                        ? `Account created! Check your email to confirm, then log in to continue to ${redirectTarget}.`
+                        : 'Account created! Check your email to confirm, then log in.',
+                    false
+                );
                 form.reset();
             } catch (err) {
                 showMessage(err.message || 'Something went wrong. Please try again.', true);
@@ -95,10 +110,10 @@
         });
 
         document.getElementById('google-btn').addEventListener('click', () => {
-            signInWithProvider('google').catch(err => showMessage(err.message, true));
+            signInWithProvider('google', redirectTarget).catch(err => showMessage(err.message, true));
         });
         document.getElementById('facebook-btn').addEventListener('click', () => {
-            signInWithProvider('facebook').catch(err => showMessage(err.message, true));
+            signInWithProvider('facebook', redirectTarget).catch(err => showMessage(err.message, true));
         });
     </script>
 </body>
