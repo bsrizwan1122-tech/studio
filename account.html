@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Services Studio | My Account</title>
+    <title>Digital Services Studio | My Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,29 +16,193 @@
             <nav class="hidden md:flex space-x-8 items-center">
                 <a href="index.html" class="hover:text-gold transition">Home</a>
                 <a href="portfolio.html" class="hover:text-gold transition">Portfolio</a>
-                <a href="contact.html" class="btn-primary ml-4">Get a Quote</a>
+                <div class="relative nav-dropdown py-2">
+                    <button class="hover:text-gold transition flex items-center">
+                        Tools <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="absolute left-0 mt-2 w-56 bg-blue rounded-md shadow-lg py-2 nav-dropdown-menu">
+                        <a href="tools-image-compressor.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Image Compressor</a>
+                        <a href="tools-image-generator.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Image Generator</a>
+                        <a href="tools-translator.html" class="block px-4 py-2 hover:bg-gray-700 hover:text-gold">Translator</a>
+                    </div>
+                </div>
+                <button id="logout-btn-nav" class="text-gray-400 hover:text-red-400 transition text-sm">
+                    <i class="fas fa-sign-out-alt mr-1"></i>Log Out
+                </button>
             </nav>
         </div>
     </header>
 
-    <section class="py-20 px-6 container mx-auto">
-        <div id="loading" class="max-w-md mx-auto text-center py-20">
-            <i class="fas fa-circle-notch fa-spin text-3xl text-gold"></i>
-        </div>
+    <div id="loading" class="py-32 text-center">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-gold"></i>
+    </div>
 
-        <div id="account-content" class="hidden max-w-md mx-auto">
-            <div class="bg-blue p-8 rounded-2xl border border-gray-800 text-center">
-                <div class="w-20 h-20 rounded-full bg-gold/10 border border-gold flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-user text-3xl text-gold"></i>
+    <div id="dashboard-content" class="hidden">
+        <!-- Welcome banner -->
+        <section class="border-b border-gray-800 bg-gradient-to-r from-blue to-navy">
+            <div class="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
+                <div class="flex items-center gap-5">
+                    <div class="w-20 h-20 rounded-full bg-gold/10 border-2 border-gold flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-3xl text-gold"></i>
+                    </div>
+                    <div>
+                        <div class="section-label">Dashboard</div>
+                        <h1 id="user-name" class="text-3xl lg:text-4xl font-bold"></h1>
+                        <p id="user-email" class="text-gray-400 mt-1"></p>
+                        <p id="user-since" class="text-gray-500 text-sm mt-1"></p>
+                    </div>
                 </div>
-                <h1 id="user-name" class="text-2xl font-bold mb-1"></h1>
-                <p id="user-email" class="text-gray-400 mb-8"></p>
-                <button id="logout-btn" class="btn-secondary w-full py-3">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Log Out
-                </button>
+                <a href="contact.html" class="btn-primary px-6 py-3 whitespace-nowrap">
+                    <i class="fas fa-paper-plane mr-2"></i>Start a New Project
+                </a>
+            </div>
+        </section>
+
+        <section class="container mx-auto px-6 py-14">
+
+            <!-- Quick actions -->
+            <div class="mb-4">
+                <div class="section-label">Quick Actions</div>
+                <h2 class="text-2xl font-bold">Order a Service</h2>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <a href="apply-wordpress.html" class="service-card p-6 block">
+                    <div class="service-icon-wrap"><i class="fas fa-wordpress"></i></div>
+                    <h3 class="font-bold mb-1">WordPress Development</h3>
+                    <p class="text-gray-400 text-sm">Custom, fast websites.</p>
+                </a>
+                <a href="apply-data-entry.html" class="service-card p-6 block">
+                    <div class="service-icon-wrap"><i class="fas fa-keyboard"></i></div>
+                    <h3 class="font-bold mb-1">Data Entry</h3>
+                    <p class="text-gray-400 text-sm">Accurate, confidential.</p>
+                </a>
+                <a href="apply-video-editing.html" class="service-card p-6 block">
+                    <div class="service-icon-wrap"><i class="fas fa-film"></i></div>
+                    <h3 class="font-bold mb-1">Video Editing</h3>
+                    <p class="text-gray-400 text-sm">Polished, professional cuts.</p>
+                </a>
+                <a href="apply-ai-creation.html" class="service-card p-6 block">
+                    <div class="service-icon-wrap"><i class="fas fa-robot"></i></div>
+                    <h3 class="font-bold mb-1">AI Creation</h3>
+                    <p class="text-gray-400 text-sm">AI images & content.</p>
+                </a>
+            </div>
+
+            <!-- Tools -->
+            <div class="mb-4">
+                <div class="section-label">Free Tools</div>
+                <h2 class="text-2xl font-bold">Your Toolkit</h2>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-6 mb-16">
+                <a href="tools-image-compressor.html" class="feature-item block">
+                    <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-compress"></i></div>
+                    <div>
+                        <h4 class="font-bold mb-1">Image Compressor</h4>
+                        <p class="text-gray-400 text-sm">Shrink images in your browser.</p>
+                    </div>
+                </a>
+                <a href="tools-image-generator.html" class="feature-item block">
+                    <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <div>
+                        <h4 class="font-bold mb-1">Image Generator</h4>
+                        <p class="text-gray-400 text-sm">AI images from text prompts.</p>
+                    </div>
+                </a>
+                <a href="tools-translator.html" class="feature-item block">
+                    <div class="feature-icon" style="background:rgba(245,166,35,0.12); color:var(--gold);"><i class="fas fa-language"></i></div>
+                    <div>
+                        <h4 class="font-bold mb-1">Translator</h4>
+                        <p class="text-gray-400 text-sm">100+ languages, instantly.</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Account details -->
+                <div class="lg:col-span-2 bg-blue p-8 rounded-xl border border-gray-800">
+                    <h3 class="text-xl font-bold mb-6">Account Details</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b border-gray-800 pb-4">
+                            <span class="text-gray-400">Full Name</span>
+                            <span id="detail-name" class="font-semibold"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-4">
+                            <span class="text-gray-400">Email Address</span>
+                            <span id="detail-email" class="font-semibold"></span>
+                        </div>
+                        <div class="flex justify-between border-b border-gray-800 pb-4">
+                            <span class="text-gray-400">Sign-in Method</span>
+                            <span id="detail-provider" class="font-semibold capitalize"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Member Since</span>
+                            <span id="detail-joined" class="font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="bg-blue p-8 rounded-xl border border-gray-800">
+                    <h3 class="text-xl font-bold mb-4">Need Help?</h3>
+                    <p class="text-gray-400 text-sm mb-6">Have a question about an order or your account? Reach out any time.</p>
+                    <a href="contact.html" class="btn-secondary w-full block text-center py-3 mb-3">
+                        <i class="fas fa-envelope mr-2"></i>Contact Support
+                    </a>
+                    <button id="logout-btn" class="btn-secondary w-full py-3 border-red-500 text-red-400 hover:bg-red-500 hover:text-white">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Log Out
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-navy pt-16 pb-8 border-t border-gray-800 px-6 mt-16">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+                <a href="index.html" class="text-2xl font-bold text-white tracking-wide block mb-4">Studio<span class="text-gold">.</span></a>
+                <p class="text-gray-400 text-sm mb-6">Premium digital services agency specializing in WordPress, Data Entry, Video Editing, and AI Creation.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition text-xl"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Quick Links</h4>
+                <ul class="space-y-3">
+                    <li><a href="index.html" class="text-gray-400 hover:text-gold transition text-sm">Home</a></li>
+                    <li><a href="about.html" class="text-gray-400 hover:text-gold transition text-sm">About Us</a></li>
+                    <li><a href="portfolio.html" class="text-gray-400 hover:text-gold transition text-sm">Portfolio</a></li>
+                    <li><a href="pricing.html" class="text-gray-400 hover:text-gold transition text-sm">Pricing</a></li>
+                    <li><a href="contact.html" class="text-gray-400 hover:text-gold transition text-sm">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Free Tools</h4>
+                <ul class="space-y-3">
+                    <li><a href="tools-image-compressor.html" class="text-gray-400 hover:text-gold transition text-sm">Image Compressor</a></li>
+                    <li><a href="tools-image-generator.html" class="text-gray-400 hover:text-gold transition text-sm">Image Generator</a></li>
+                    <li><a href="tools-translator.html" class="text-gray-400 hover:text-gold transition text-sm">Translator</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Contact Us</h4>
+                <ul class="space-y-4">
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-envelope text-gold mt-1 mr-3"></i><a href="mailto:hello@studio.com" class="hover:text-gold transition">hello@studio.com</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fab fa-whatsapp text-gold mt-1 mr-3"></i><a href="tel:+1234567890" class="hover:text-gold transition">+1 (234) 567-890</a></li>
+                    <li class="flex items-start text-gray-400 text-sm"><i class="fas fa-map-marker-alt text-gold mt-1 mr-3"></i><span>123 Digital Ave, Tech District<br>New York, NY 10001</span></li>
+                </ul>
             </div>
         </div>
-    </section>
+        <div class="container mx-auto border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+            <p>&copy; 2026 Digital Services Studio. All rights reserved.</p>
+            <div class="mt-4 md:mt-0 space-x-4">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="auth.js"></script>
     <script>
@@ -48,14 +212,27 @@
                 window.location.href = 'login.html';
                 return;
             }
+
             const name = (user.user_metadata && user.user_metadata.full_name) || user.email.split('@')[0];
-            document.getElementById('user-name').textContent = name;
+            const joined = new Date(user.created_at);
+            const joinedStr = joined.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+            const provider = (user.app_metadata && user.app_metadata.provider) || 'email';
+
+            document.getElementById('user-name').textContent = `Welcome back, ${name.split(' ')[0]}`;
             document.getElementById('user-email').textContent = user.email;
+            document.getElementById('user-since').textContent = `Member since ${joinedStr}`;
+
+            document.getElementById('detail-name').textContent = name;
+            document.getElementById('detail-email').textContent = user.email;
+            document.getElementById('detail-provider').textContent = provider;
+            document.getElementById('detail-joined').textContent = joinedStr;
+
             document.getElementById('loading').classList.add('hidden');
-            document.getElementById('account-content').classList.remove('hidden');
+            document.getElementById('dashboard-content').classList.remove('hidden');
         })();
 
         document.getElementById('logout-btn').addEventListener('click', signOutUser);
+        document.getElementById('logout-btn-nav').addEventListener('click', signOutUser);
     </script>
 </body>
 </html>
